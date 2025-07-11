@@ -1,0 +1,130 @@
+---
+globs: *.cs
+alwaysApply: false
+---
+# .NET Development Best Practices
+
+## Code Formatting
+- Use consistent indentation and spacing.
+- Follow PascalCase for method and class names.
+- Use `var` only when the type is obvious.
+```csharp
+// ✅ DO:
+public class OrderService {
+    public void ProcessOrder() { ... }
+}
+var count = 5;
+
+// ❌ DON'T:
+public class orderservice {
+    public void processorder() { ... }
+}
+int count = 5;
+```
+
+## Error Handling
+- Catch only specific exceptions.
+- Use try-catch-finally blocks for resource cleanup.
+- Log meaningful error messages.
+```csharp
+// ✅ DO:
+try {
+    // ...
+} catch (FileNotFoundException ex) {
+    logger.LogError(ex, "File not found");
+} finally {
+    resource.Dispose();
+}
+
+// ❌ DON'T:
+try {
+    // ...
+} catch (Exception ex) {
+    // Swallowing all exceptions
+}
+```
+
+## Asynchronous Programming
+- Use async/await for I/O operations.
+- Avoid blocking calls like `.Result` or `.Wait()`.
+```csharp
+// ✅ DO:
+public async Task<string> GetDataAsync() {
+    return await httpClient.GetStringAsync(url);
+}
+
+// ❌ DON'T:
+public string GetData() {
+    return httpClient.GetStringAsync(url).Result;
+}
+```
+
+## Dependency Injection
+- Inject dependencies via constructors.
+- Avoid service locator pattern.
+```csharp
+// ✅ DO:
+public class MyService {
+    private readonly IRepository _repo;
+    public MyService(IRepository repo) {
+        _repo = repo;
+    }
+}
+
+// ❌ DON'T:
+public class MyService {
+    public void DoWork() {
+        var repo = ServiceLocator.Get<IRepository>();
+    }
+}
+```
+
+## Security
+- Use `[Authorize]` attributes for protected endpoints.
+- Validate all user inputs.
+```csharp
+// ✅ DO:
+[Authorize]
+public IActionResult GetSecret() { ... }
+
+// ❌ DON'T:
+public IActionResult GetSecret() { ... } // No authorization
+```
+
+## Unit Testing
+- Write tests for critical business logic.
+- Use mocking frameworks to isolate dependencies.
+```csharp
+// ✅ DO:
+[TestMethod]
+public void Add_ReturnsSum() {
+    var result = calc.Add(2, 3);
+    Assert.AreEqual(5, result);
+}
+```
+
+## Modern C# Features
+- Prefer language keywords (`string`, `int`) over CLR types.
+- Use LINQ for collection manipulation.
+```csharp
+// ✅ DO:
+string name = "Alice";
+var filtered = list.Where(x => x.IsActive).ToList();
+
+// ❌ DON'T:
+String name = "Alice";
+List<Item> filtered = new List<Item>();
+foreach (var x in list) {
+    if (x.IsActive) filtered.Add(x);
+}
+```
+
+## Performance
+- Cache frequently accessed data.
+- Compress HTTP responses.
+```csharp
+// ✅ DO:
+services.AddResponseCaching();
+services.AddResponseCompression();
+```
+
